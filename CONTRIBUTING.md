@@ -20,7 +20,7 @@ A non-exhaustive list of things that usually get rejected:
 We currently use the following languages to develop DDNet.
 
 - C++
-- very marginally Rust
+- very marginally Rust mmh
 - Python for code generation and supporting tools
 - CMake for building
 
