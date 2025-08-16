@@ -717,6 +717,9 @@ if(TARGET_OS STREQUAL "windows")
   set(PLATFORM_CLIENT)
   set(PLATFORM_CLIENT_LIBS opengl32 winmm imm32)
   set(PLATFORM_LIBS)
+  # advapi32 needed for Reg* and Crypt* (RegCloseKey, RegOpenKeyExW, RegSetValueExW, RegDeleteTreeW, RegGetValueW,
+  # CryptAcquireContextW, CryptGenRandom, CryptReleaseContext)
+  list(APPEND PLATFORM_LIBS advapi32)
   list(APPEND PLATFORM_LIBS shlwapi) # PathIsRelativeW
   list(APPEND PLATFORM_LIBS version ws2_32) # Windows sockets
   list(APPEND PLATFORM_LIBS bcrypt userenv) # for Rust (https://github.com/rust-lang/rust/issues/91974)
@@ -881,8 +884,9 @@ list(APPEND TARGETS_OWN rust-bridge-shared)
 
 if(TARGET_OS STREQUAL "android")
   set(CARGO_BUILD_DIR "${CARGO_NDK_TARGET}/")
-  set(CARGO_BUILD ${CMAKE_COMMAND} -E env CARGO_TARGET_DIR=${PROJECT_BINARY_DIR} DDNET_TEST_NO_LINK=1 ${RUST_CARGO} ndk --manifest-path "${PROJECT_SOURCE_DIR}/Cargo.toml" -t ${CARGO_NDK_TARGET} -p ${CARGO_NDK_API} build)
-  set(CARGO_TEST ${CMAKE_COMMAND} -E env CARGO_TARGET_DIR=${PROJECT_BINARY_DIR} ${RUST_CARGO} ndk -t ${CARGO_NDK_TARGET} -p ${CARGO_NDK_API} test)
+  # Use --platform instead of deprecated/unsupported -p (some environments reject -p with "unexpected argument '-p'")
+  set(CARGO_BUILD ${CMAKE_COMMAND} -E env CARGO_TARGET_DIR=${PROJECT_BINARY_DIR} DDNET_TEST_NO_LINK=1 ${RUST_CARGO} ndk --manifest-path "${PROJECT_SOURCE_DIR}/Cargo.toml" -t ${CARGO_NDK_TARGET} --platform ${CARGO_NDK_API} build)
+  set(CARGO_TEST ${CMAKE_COMMAND} -E env CARGO_TARGET_DIR=${PROJECT_BINARY_DIR} ${RUST_CARGO} ndk -t ${CARGO_NDK_TARGET} --platform ${CARGO_NDK_API} test)
 else()
   set(CARGO_BUILD_DIR "")
   set(CARGO_BUILD ${CMAKE_COMMAND} -E env CARGO_TARGET_DIR=${PROJECT_BINARY_DIR} DDNET_TEST_NO_LINK=1 ${RUST_CARGO} build --manifest-path "${PROJECT_SOURCE_DIR}/Cargo.toml")
@@ -3180,6 +3184,12 @@ list(APPEND TARGETS_LINK rust_test)
 
 set(RUST_TEST_LIBS ${LIBS} $<TARGET_FILE:rust_test>)
 list(REMOVE_ITEM RUST_TEST_LIBS "-pthread")
+# On Windows the Rust test link currently misses advapi32 (needed for Reg*/Crypt* symbols)
+# even though it is part of PLATFORM_LIBS for the main targets. Explicitly append here
+# to satisfy linking of secure_random.cpp and shell_execute.cpp used inside rust_test.
+if(TARGET_OS STREQUAL "windows")
+  list(APPEND RUST_TEST_LIBS advapi32)
+endif()
 add_custom_target(run_rust_tests
   COMMAND ${CMAKE_COMMAND} -E env "DDNET_TEST_LIBRARIES=${RUST_TEST_LIBS}" ${CARGO_TEST}
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

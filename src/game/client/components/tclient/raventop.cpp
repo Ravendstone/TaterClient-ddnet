@@ -1,12 +1,16 @@
-#include "raventop.h"
-
+// Raven top minimal component
 #include <algorithm>
+
 #include <base/log.h>
 #include <base/system.h>
+
 #include <engine/client.h>
 #include <engine/external/json-parser/json.h>
-#include <game/client/gameclient.h>
+
 #include <game/client/components/chat.h>
+#include <game/client/gameclient.h>
+
+#include "raventop.h"
 
 static void SimpleEscape(char *pDst, int DstSize, const char *pSrc)
 {
@@ -248,8 +252,10 @@ void CRavenTop::ConShowTop(IConsole::IResult *pResult, void *pUserData)
     if(pResult->NumArguments() > 0)
     {
         Count = pResult->GetInteger(0);
-        if(Count < 1) Count = 1;
-        if(Count > 50) Count = 50;
+        if(Count < 1)
+            Count = 1;
+        if(Count > 50)
+            Count = 50;
     }
     pSelf->m_RequestedCount = Count;
     if(pSelf->HasValidData())
