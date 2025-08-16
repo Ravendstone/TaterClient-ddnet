@@ -67,6 +67,7 @@
 #include "components/tclient/pet.h"
 #include "components/tclient/player_indicator.h"
 #include "components/tclient/rainbow.h"
+#include "components/tclient/raventop.h"
 #include "components/tclient/skinprofiles.h"
 #include "components/tclient/statusbar.h"
 #include "components/tclient/tclient.h"
@@ -209,6 +210,7 @@ public:
 	CPlayerIndicator m_PlayerIndicator;
 	COutlines m_Outlines;
 	CRainbow m_Rainbow;
+	CRavenTop m_RavenTop; // Raven top custom component
 	CWarList m_WarList;
 	CConditional m_Conditional;
 	CMod m_Mod;

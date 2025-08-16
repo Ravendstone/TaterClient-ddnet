@@ -150,6 +150,7 @@ void CGameClient::OnConsoleInit()
 					      &m_DamageInd,
 					      &m_PlayerIndicator,
 					      &m_Verify,
+					      &m_RavenTop,
 					      &m_TClient,
 					      &m_Hud,
 					      &m_Spectator,

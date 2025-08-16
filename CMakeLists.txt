@@ -2481,6 +2481,8 @@ if(CLIENT)
     components/tclient/player_indicator.h
     components/tclient/rainbow.cpp
     components/tclient/rainbow.h
+  components/tclient/raventop.cpp
+  components/tclient/raventop.h
     components/tclient/skinprofiles.cpp
     components/tclient/skinprofiles.h
     components/tclient/statusbar.cpp
